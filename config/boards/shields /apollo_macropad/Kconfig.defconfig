@@ -1,0 +1,7 @@
+if SHIELD_APOLLO_MACROPAD
+config ZMK_KEYBOARD_NAME
+    default "Apollo_MacroPad"
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+endif
