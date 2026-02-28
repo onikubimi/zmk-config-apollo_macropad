@@ -6,9 +6,9 @@ requires:
   - pro_micro
 features:
   - keys
+  - encoder
+  - display
   - studio
-siblings:
-  - apollo_macropad
 boards:
   - nice_nano_v2
   - nice_nano
