@@ -9,6 +9,7 @@ features:
   - encoder
   - display
   - studio
+  - pointer
 boards:
   - nice_nano_v2
   - nice_nano
