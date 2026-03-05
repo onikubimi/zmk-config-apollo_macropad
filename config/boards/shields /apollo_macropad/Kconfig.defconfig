@@ -1,7 +1,18 @@
 if SHIELD_APOLLO_MACROPAD
-config ZMK_KEYBOARD_NAME
-    default "Apollo_MacroPad"
 
-config ZMK_SPLIT_ROLE_CENTRAL
+config ZMK_KEYBOARD_NAME
+    default "Apollo MacroPad"
+
+# ポインティングデバイス(トラックボール)機能を有効化
+config ZMK_POINTING
     default y
+
+# トラックボール(PMW3610)の通信に使用するSPIを有効化
+config SPI
+    default y
+
+# 入力イベント処理レイヤーを有効化
+config INPUT
+    default y
+
 endif
