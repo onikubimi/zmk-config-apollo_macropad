@@ -6,50 +6,44 @@
     chosen {
         zmk,kscan = &kscan0;
         zmk,physical-layout = &physical_layout0;
-        zephyr,display = &oled;
     };
 
-    // 画像の2列x4行配置を座標(x, y)で定義
     physical_layout0: physical_layout0 {
         compatible = "zmk,physical-layout";
         display-name = "Default Layout";
         transform = <&default_transform>;
         keys
-            = <&key_physical_attrs 100 100 100   0   0   0   0> // SW1 (右1段目)
-            , <&key_physical_attrs 100 100 100 100   0   0   0> // SW2 (右2段目)
-            , <&key_physical_attrs 100 100   0 200   0   0   0> // SW3 (左3段目)
-            , <&key_physical_attrs 100 100   0 300   0   0   0> // SW4 (左4段目/EC12)
-            , <&key_physical_attrs 100 100 100 300   0   0   0> // SW5 (右4段目)
+            = <&key_physical_attrs 100 100 100   0   0   0   0> // SW1
+            , <&key_physical_attrs 100 100 100 100   0   0   0> // SW2
+            , <&key_physical_attrs 100 100   0 200   0   0   0> // SW3
+            , <&key_physical_attrs 100 100   0 300   0   0   0> // SW4
+            , <&key_physical_attrs 100 100 100 300   0   0   0> // SW5
             ;
     };
 
-    // 論理行列：画像のスイッチ位置にマッピング
     default_transform: keymap_transform0 {
         compatible = "zmk,matrix-transform";
         columns = <2>;
         rows = <4>;
         map = <
-            /* 1段目 */           RC(0,0)  // SW1
-            /* 2段目 */           RC(0,1)  // SW2
-            /* 3段目 */  RC(0,2)           // SW3 (Trackballはポインティングデバイスのためここには含めない)
-            /* 4段目 */  RC(0,3)  RC(0,4)  // SW4, SW5
+            RC(0,0) RC(0,1)
+            RC(0,2)
+            RC(0,3) RC(0,4)
         >;
     };
 
-    // ダイレクトピン接続
     kscan0: kscan0 {
         compatible = "zmk,kscan-gpio-direct";
         wakeup-source;
         input-gpios
-            = <&pro_micro 18 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // RC(0,0)
-            , <&pro_micro 19 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // RC(0,1)
-            , <&pro_micro 20 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // RC(0,2)
-            , <&pro_micro 21 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // RC(0,3)
-            , <&pro_micro 15 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // RC(0,4)
+            = <&pro_micro 18 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW1
+            , <&pro_micro 19 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW2
+            , <&pro_micro 20 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW3
+            , <&pro_micro 21 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW4
+            , <&pro_micro 15 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW5
             ;
     };
 
-    // エンコーダー定義
     left_encoder: encoder_left {
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 14 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
@@ -65,27 +59,6 @@
     };
 };
 
-// OLED (I2C) 定義
-&pro_micro_i2c {
-    status = "okay";
-
-    oled: ssd1306@3c {
-        compatible = "solomon,ssd1306fb";
-        reg = <0x3c>;
-        width = <128>;
-        height = <32>;
-        segment-offset = <0>;
-        page-offset = <0>;
-        display-offset = <0>;
-        multiplex-ratio = <31>;
-        segment-remap;
-        com-invdir;
-        com-sequential;
-        prechargep = <0x22>;
-    };
-};
-
-// トラックボール用 SPI Pinctrl
 &pinctrl {
     spi0_default: spi0_default {
         group1 {
@@ -104,7 +77,6 @@
     };
 };
 
-// SPI デバイス定義 (PMW3610 トラックボール)
 &spi0 {
     status = "okay";
     compatible = "nordic,nrf-spim";
@@ -127,7 +99,6 @@
     };
 };
 
-// ZaruBall構成の入力リスナー
 / {
     trackball_listener: trackball_listener {
         compatible = "zmk,input-listener";
