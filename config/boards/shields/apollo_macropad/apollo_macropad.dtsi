@@ -36,18 +36,18 @@
         compatible = "zmk,kscan-gpio-direct";
         wakeup-source;
         input-gpios
-            = <&pro_micro 18 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW1
-            , <&pro_micro 19 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW2
-            , <&pro_micro 20 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW3
-            , <&pro_micro 21 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW4
-            , <&pro_micro 15 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW5
+            = <&gpio0 9  (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW1 (P0.09)
+            , <&gpio0 10 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW2 (P0.10)
+            , <&gpio1 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW3 (P1.11)
+            , <&gpio1 13 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW4 (P1.13)
+            , <&gpio0 3  (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW5 (P0.03)
             ;
     };
 
     left_encoder: encoder_left {
         compatible = "alps,ec11";
-        a-gpios = <&pro_micro 14 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
-        b-gpios = <&pro_micro 16 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        a-gpios = <&gpio0 2  (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; // P0.02
+        b-gpios = <&gpio0 29 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; // P0.29
         steps = <80>;
         status = "okay";
     };
@@ -83,14 +83,14 @@
     pinctrl-0 = <&spi0_default>;
     pinctrl-1 = <&spi0_sleep>;
     pinctrl-names = "default", "sleep";
-    cs-gpios = <&pro_micro 7 GPIO_ACTIVE_LOW>;
+    cs-gpios = <&gpio0 10 GPIO_ACTIVE_LOW>; // D7相当
 
     trackball: trackball@0 {
         status = "okay";
         compatible = "pixart,pmw3610";
         reg = <0>;
         spi-max-frequency = <2000000>;
-        irq-gpios = <&pro_micro 8 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        irq-gpios = <&gpio1 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; // D8相当
         cpi = <600>;
         evt-type = <INPUT_EV_REL>;
         x-input-code = <INPUT_REL_X>;
