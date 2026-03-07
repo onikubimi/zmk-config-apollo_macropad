@@ -95,17 +95,22 @@
     pinctrl-names = "default", "sleep";
     cs-gpios = <&pro_micro 7 GPIO_ACTIVE_LOW>; // D7
 
-    trackball: trackball@0 {
+trackball: trackball@0 {
         status = "okay";
         compatible = "pixart,pmw3610";
         reg = <0>;
         spi-max-frequency = <2000000>;
-        // 重要：badjeff氏のドライバに合わせて motion-gpios にリネーム
         motion-gpios = <&pro_micro 8 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; 
         cpi = <600>;
-        evt-type = <INPUT_EV_REL>;
-        x-input-code = <INPUT_REL_X>;
-        y-input-code = <INPUT_REL_Y>;
+        
+        /* エラー解決のための修正点 */
+        zephyr,axis-x = <INPUT_REL_X>;
+        zephyr,axis-y = <INPUT_REL_Y>;
+        
+        /* 古い記述形式（もし残っていたら削除またはコメントアウト） */
+        // x-input-code = <INPUT_REL_X>;
+        // y-input-code = <INPUT_REL_Y>;
+
         force-awake;
     };
 };
