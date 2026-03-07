@@ -3,16 +3,12 @@
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/outputs.h>
 #include <dt-bindings/zmk/pointing.h>
-
-/* トラックボール加工用の辞書：後でスクロール変換等を使うために必須 */
 #include <input/processors.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
 
-/* レイヤー定義：将来的にレイヤーを増やす時はここに追加 */
 #define BASE 0
 
 / {
-    /* トラックボールの設定：将来的にスクロール機能を追加しやすい記述に変更 */
     trackball_listener: trackball_listener {
         compatible = "zmk,input-listener";
         device = <&trackball>;
@@ -29,12 +25,11 @@
         base_layer {
             display-name = "Base";
             
-            /* SW1〜SW5 の割り当て */
             bindings = <
-                /* row 0 */           &kp C_AC_COPY   // SW1 (右)
-                /* row 1 */           &kp C_AC_PASTE  // SW2 (右)
-                /* row 2 */ &mkp RCLK                 // SW3 (左)
-                /* row 3 */ &mkp LCLK  &kp ENTER       // SW4 (左・EC12), SW5 (右下)
+                           &kp C_AC_COPY   // SW1 (右)
+                           &kp C_AC_PASTE  // SW2 (右)
+                &mkp RCLK                  // SW3 (左)
+                &mkp LCLK  &kp ENTER       // SW4 (左・EC12), SW5 (右下)
             >;
 
             /* エンコーダーの回転設定 */
