@@ -4,10 +4,15 @@
 #include <input/processors.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
 
+#define BASE 0
+#define MOUSE 1
+
 &trackball_listener {
     status = "okay";
     input-processors = <
         &zip_xy_transform (INPUT_TRANSFORM_XY_SWAP | INPUT_TRANSFORM_Y_INVERT | INPUT_TRANSFORM_X_INVERT)
+        // トラックボールを動かすと、自動的にMOUSEレイヤー(1)に切り替わり、止まると500msでBASEに戻る
+        &zip_temp_layer MOUSE 500
     >;
 };
 
@@ -24,16 +29,29 @@
     keymap {
         compatible = "zmk,keymap";
 
-        default_layer {
+        // 通常時：N1〜N5が入力されるレイヤー
+        base_layer {
             display-name = "Base";
             sensor-bindings = <&scroll_wheel>;
-            
             bindings = <
                 &kp N1    // SW1
                 &kp N2    // SW2
                 &kp N3    // SW3
-                &kp N4    // SW4 (EC12)
+                &kp N4    // SW4
                 &kp N5    // SW5
+            >;
+        };
+
+        // トラックボール操作中：自動でここになり、クリックが可能になる
+        mouse_layer {
+            display-name = "Mouse";
+            sensor-bindings = <&scroll_wheel>;
+            bindings = <
+                &mkp RCLK    // SW1 (操作中は右クリック)
+                &mkp MCLK    // SW2 (操作中は中クリック)
+                &kp ESC      // SW3 (操作中でもESCは使える)
+                &mkp LCLK    // SW4 (操作中は左クリック)
+                &kp ENTER    // SW5 (操作中でも確定はできる)
             >;
         };
     };
