@@ -29,11 +29,11 @@
             sensor-bindings = <&scroll_wheel>;
             
             bindings = <
-                &mkp RCLK    // SW1
-                &mkp MCLK    // SW2
-                &kp ESC      // SW3
-                &mkp LCLK    // SW4 (EC12 Click)
-                &kp ENTER    // SW5
+                &kp N1    // SW1
+                &kp N2    // SW2
+                &kp N3    // SW3
+                &kp N4    // SW4 (EC12)
+                &kp N5    // SW5
             >;
         };
     };
