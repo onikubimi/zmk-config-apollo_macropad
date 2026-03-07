@@ -11,8 +11,4 @@ config ZMK_POINTING
 config SPI
     default y
 
-# 入力イベント処理レイヤーを有効化
-config INPUT
-    default y
-
 endif
