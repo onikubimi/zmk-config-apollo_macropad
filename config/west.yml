@@ -7,10 +7,10 @@ manifest:
   projects:
     - name: zmk
       remote: zmkfirmware
-      revision: main  # 最新のZMK Studio対応版を使うためにmain推奨
+      revision: v0.3
       import: app/west.yml
     - name: zmk-pmw3610-driver
       remote: badjeff
-      revision: main  # 最新のZMKに合わせるため
+      revision: zmk-0.3
   self:
     path: config
