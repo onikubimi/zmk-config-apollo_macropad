@@ -9,24 +9,23 @@
     };
 };
 
-// 物理レイアウト設定（ZMK Studio用）
+// ザルボール形式の物理レイアウト定義 (5ボタン分)
 / {
     physical_layout0: physical_layout0 {
         compatible = "zmk,physical-layout";
         display-name = "Default Layout";
         transform = <&default_transform>;
-        // nice!nanoの5ボタン+エンコーダー+トラックボールの配置に合わせて調整してください
         keys
-            = <&key_physical_attrs 100 100   0   0  0  0  0>
-            , <&key_physical_attrs 100 100 100   0  0  0  0>
-            , <&key_physical_attrs 100 100 200   0  0  0  0>
-            , <&key_physical_attrs 100 100 300   0  0  0  0>
-            , <&key_physical_attrs 100 100 400   0  0  0  0>
+            = <&key_physical_attrs 100 100   0   0   0   0   0>
+            , <&key_physical_attrs 100 100 100   0   0   0   0>
+            , <&key_physical_attrs 100 100 200   0   0   0   0>
+            , <&key_physical_attrs 100 100 300   0   0   0   0>
+            , <&key_physical_attrs 100 100 400   0   0   0   0>
             ;
     };
 };
 
-// マトリックス変換
+// マトリックス変換 (5ボタン直結用)
 / {
     default_transform: keymap_transform0 {
         compatible = "zmk,matrix-transform";
@@ -36,21 +35,22 @@
     };
 };
 
-// KSCAN設定 (Direct Pin)
+// KSCAN (ダイレクトピン接続)
 / {
     kscan0: kscan0 {
         compatible = "zmk,kscan-gpio-direct";
+        wakeup-source;
         input-gpios
-            = <&pro_micro 18 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW1
-            , <&pro_micro 19 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW2
-            , <&pro_micro 20 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW3
-            , <&pro_micro 21 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW4
-            , <&pro_micro 15 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // SW5
+            = <&pro_micro 18 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            , <&pro_micro 19 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            , <&pro_micro 20 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            , <&pro_micro 21 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            , <&pro_micro 15 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
             ;
     };
 };
 
-// エンコーダー
+// エンコーダー設定
 / {
     encoder: encoder {
         compatible = "alps,ec11";
@@ -67,13 +67,13 @@
     };
 };
 
-// トラックボール (SPI)
+// トラックボール (SPI Pinctrl)
 &pinctrl {
     spi0_default: spi0_default {
         group1 {
             psels = <NRF_PSEL(SPIM_SCK, 0, 8)>,    // D5 (P0.08)
                     <NRF_PSEL(SPIM_MOSI, 0, 6)>,   // D4 (P0.06)
-                    <NRF_PSEL(SPIM_MISO, 0, 6)>;   // MOSIと同じ
+                    <NRF_PSEL(SPIM_MISO, 0, 6)>;   // D4 (Shared)
         };
     };
 
@@ -87,6 +87,7 @@
     };
 };
 
+// SPIデバイス定義
 &spi0 {
     status = "okay";
     compatible = "nordic,nrf-spim";
@@ -95,26 +96,25 @@
     pinctrl-names = "default", "sleep";
     cs-gpios = <&pro_micro 7 GPIO_ACTIVE_LOW>; // D7
 
-trackball: trackball@0 {
+    trackball: trackball@0 {
         status = "okay";
         compatible = "pixart,pmw3610";
         reg = <0>;
         spi-max-frequency = <2000000>;
-        motion-gpios = <&pro_micro 8 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; 
-        
-        /* 修正箇所：cpi を res-cpi に変更 */
-        res-cpi = <600>; 
-        
-        zephyr,axis-x = <INPUT_REL_X>;
-        zephyr,axis-y = <INPUT_REL_Y>;
+        irq-gpios = <&pro_micro 8 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; // D8
+        cpi = <600>;
+        evt-type = <INPUT_EV_REL>;
+        x-input-code = <INPUT_REL_X>;
+        y-input-code = <INPUT_REL_Y>;
         force-awake;
     };
 };
 
+// 入力リスナー (Keymap側で制御するため、ここではstatus定義のみ)
 / {
     trackball_listener: trackball_listener {
         compatible = "zmk,input-listener";
-        status = "okay"; // disabledからokayに変更して有効化
         device = <&trackball>;
+        status = "okay";
     };
 };
