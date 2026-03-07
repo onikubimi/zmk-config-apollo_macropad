@@ -1,2 +1,0 @@
-config SHIELD_APOLLO_MACROPAD
-    def_bool $(shields_list_contains,apollo_macropad)
