@@ -1,6 +1,7 @@
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/outputs.h>
 #include <dt-bindings/zmk/pointing.h>
 
 #include <input/processors.dtsi>
@@ -39,7 +40,7 @@
             // 5つの物理ボタンの割り当て（お好みに合わせて変更してください）
             // 左から順に: [左クリック] [右クリック] [中クリック] [戻る] [進む]
             bindings = <
-                &mkp LCLK    &mkp RCLK    &mkp MCLK    &mkp MB4    &mkp MB5
+                &kp N1    &kp N2    &kp N3    &kp N4    &kp N5
             >;
         };
     };
