@@ -10,28 +10,11 @@
         com-invdir;
         com-sequential;
         prechargep = <0x22>;
-        /* 以下の3行を必ず追記してください */
+        
+        /* 必須項目の追加 */
         segment-offset = <0>;
         page-offset = <0>;
         display-offset = <0>;
-    };
-};
-
-/* トラックボールのリスナー定義を追加 */
-/ {
-    trackball_listener: trackball_listener {
-        compatible = "zmk,input-listener";
-        device = <&trackball>; // PMW3610のラベル名に合わせてください
-    };
-};
-
-/* もし PMW3610 の定義が &pro_micro_spi にあるなら、そのラベルを確認 */
-&pro_micro_spi {
-    status = "okay";
-    trackball: pmw3610@0 {
-        compatible = "pixart,pmw3610";
-        reg = <0>;
-        spi-max-frequency = <2000000>;
-        irq-gpios = <&pro_micro 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; // ピン番号は基板に合わせて
+        multiplex-ratio = <31>;  /* 高さ - 1 の値を設定します (32-1=31) */
     };
 };
