@@ -1,10 +1,30 @@
 #include "apollo_macropad.dtsi"
 
 / {
-    /* トラックボールの動作を監視するリスナーを定義 */
+    /* 1. トラックボールの動作を監視するリスナー（必須） */
     trackball_listener: trackball_listener {
         compatible = "zmk,input-listener";
         device = <&trackball>;
         status = "okay";
+    };
+};
+
+/* 2. トラックボール本体のハードウェア定義（もし.dtsiに無ければ必須） */
+&spi0 {
+    status = "okay";
+    /* CSピンの指定。以前のコードでは GPIO 0 10 でしたね */
+    cs-gpios = <&gpio0 10 GPIO_ACTIVE_LOW>; 
+
+    trackball: trackball@0 {
+        status = "okay";
+        compatible = "pixart,pmw3610";
+        reg = <0>;
+        spi-max-frequency = <2000000>;
+        /* IRQピンの指定。以前のコードでは GPIO 1 11 でした */
+        irq-gpios = <&gpio1 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        cpi = <600>;
+        evt-type = <INPUT_EV_REL>;
+        x-input-code = <INPUT_REL_X>;
+        y-input-code = <INPUT_REL_Y>;
     };
 };
