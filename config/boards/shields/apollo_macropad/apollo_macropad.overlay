@@ -1,44 +1,20 @@
 #include "apollo_macropad.dtsi"
 
-/ {
-    chosen {
-        zephyr,display = &oled;
-    };
-};
-
-/* 1. 競合の元になる SPI0 (pro_micro_spi) を強制的に無効化する */
+/* 1. 衝突している SPI0 (pro_micro_spi) をノードごと完全に無効化 */
 &pro_micro_spi {
     status = "disabled";
+    /delete-node/ trackball@0;
 };
 
-/* 2. OLED (I2C) は 0番 をそのまま使う */
-&pro_micro_i2c {
-    status = "okay";
-    oled: ssd1306@3c {
-        compatible = "solomon,ssd1306fb";
-        reg = <0x3c>;
-        width = <128>;
-        height = <32>;
-        segment-remap;
-        com-invdir;
-        com-sequential;
-        prechargep = <0x22>;
-        segment-offset = <0>;
-        page-offset = <0>;
-        display-offset = <0>;
-        multiplex-ratio = <31>;
-    };
-};
-
-/* 3. トラックボールを SPI1 (空いている別のユニット) に完全に引っ越す */
+/* 2. トラックボールを SPI1 に配置。ラベル重複を避けるため &spi1 に直接記述 */
 &spi1 {
     status = "okay";
     pinctrl-0 = <&spi1_default>;
     pinctrl-1 = <&spi1_sleep>;
     pinctrl-names = "default", "sleep";
     
-    /* ラベル名を 'trackball' から変更して重複を避ける */
-    trackball_peripheral: pmw3610@0 {
+    /* 元のラベル 'trackball' を使わず、パス指定で競合を回避 */
+    new_trackball: pmw3610@0 {
         compatible = "pixart,pmw3610";
         reg = <0>;
         spi-max-frequency = <2000000>;
@@ -49,10 +25,30 @@
     };
 };
 
-/* 4. ZMKの入力リスナーを新しい定義に向ける */
+/* 3. ZMKの入力リスナーを新しいノードに接続 */
 / {
-    trackball_listener {
+    /* 既存のリスナーがあれば一度削除 */
+    /delete-node/ trackball_listener;
+
+    trackball_listener: trackball_listener {
         compatible = "zmk,input-listener";
-        device = <&trackball_peripheral>;
+        device = <&new_trackball>;
+    };
+
+    /* OLEDの選択を確認 */
+    chosen {
+        zephyr,display = &oled;
+    };
+};
+
+/* 4. I2C (OLED) 側が 0番 を独占できるようにする */
+&pro_micro_i2c {
+    status = "okay";
+    oled: ssd1306@3c {
+        compatible = "solomon,ssd1306fb";
+        reg = <0x3c>;
+        width = <128>;
+        height = <32>;
+        /* ...その他の設定... */
     };
 };
