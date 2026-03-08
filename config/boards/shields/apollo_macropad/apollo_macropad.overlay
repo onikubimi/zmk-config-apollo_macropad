@@ -1,7 +1,6 @@
 #include "apollo_macropad.dtsi"
 
 / {
-    /* ここを追記：システムにOLEDをメインディスプレイとして使うよう指示 */
     chosen {
         zephyr,display = &oled;
     };
@@ -12,9 +11,9 @@
     };
 };
 
+/* OLED (I2C) はそのまま 0番 (i2c0) を使用 */
 &pro_micro_i2c {
     status = "okay";
-
     oled: ssd1306@3c {
         compatible = "solomon,ssd1306fb";
         reg = <0x3c>;
@@ -31,9 +30,21 @@
     };
 };
 
-&trackball {
+/* トラックボール (SPI) を 1番 (spi1) に引っ越し */
+&spi1 {
     status = "okay";
-    evt-type = <INPUT_EV_REL>;
-    x-input-code = <INPUT_REL_X>;
-    y-input-code = <INPUT_REL_Y>;
+    pinctrl-0 = <&spi1_default>;
+    pinctrl-1 = <&spi1_sleep>;
+    pinctrl-names = "default", "sleep";
+    
+    /* pro_micro_spi の代わりに spi1 を直接使い、中身を定義 */
+    trackball: pmw3610@0 {
+        compatible = "pixart,pmw3610";
+        reg = <0>;
+        spi-max-frequency = <2000000>;
+        irq-gpios = <&pro_micro 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        evt-type = <INPUT_EV_REL>;
+        x-input-code = <INPUT_REL_X>;
+        y-input-code = <INPUT_REL_Y>;
+    };
 };
