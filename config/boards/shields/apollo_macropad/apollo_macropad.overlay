@@ -1,19 +1,18 @@
 #include "apollo_macropad.dtsi"
 
-/* 1. 衝突している SPI0 (pro_micro_spi) をノードごと完全に無効化 */
+/* 1. SPI0を完全に無効化してリソース衝突を回避（成功済み） */
 &pro_micro_spi {
     status = "disabled";
     /delete-node/ trackball@0;
 };
 
-/* 2. トラックボールを SPI1 に配置。ラベル重複を避けるため &spi1 に直接記述 */
+/* 2. トラックボールを SPI1 に配置 */
 &spi1 {
     status = "okay";
     pinctrl-0 = <&spi1_default>;
     pinctrl-1 = <&spi1_sleep>;
     pinctrl-names = "default", "sleep";
     
-    /* 元のラベル 'trackball' を使わず、パス指定で競合を回避 */
     new_trackball: pmw3610@0 {
         compatible = "pixart,pmw3610";
         reg = <0>;
@@ -25,23 +24,7 @@
     };
 };
 
-/* 3. ZMKの入力リスナーを新しいノードに接続 */
-/ {
-    /* 既存のリスナーがあれば一度削除 */
-    /delete-node/ trackball_listener;
-
-    trackball_listener: trackball_listener {
-        compatible = "zmk,input-listener";
-        device = <&new_trackball>;
-    };
-
-    /* OLEDの選択を確認 */
-    chosen {
-        zephyr,display = &oled;
-    };
-};
-
-/* 4. I2C (OLED) 側が 0番 を独占できるようにする */
+/* 3. I2C (OLED) の定義を修正（必須項目をすべて追加） */
 &pro_micro_i2c {
     status = "okay";
     oled: ssd1306@3c {
@@ -49,6 +32,27 @@
         reg = <0x3c>;
         width = <128>;
         height = <32>;
-        /* ...その他の設定... */
+        segment-remap;
+        com-invdir;
+        com-sequential;
+        prechargep = <0x22>;
+        /* 以下の3つが不足していた必須項目です */
+        segment-offset = <0>;
+        page-offset = <0>;
+        display-offset = <0>;
+        multiplex-ratio = <31>;
+    };
+};
+
+/* 4. ZMK設定 */
+/ {
+    chosen {
+        zephyr,display = &oled;
+    };
+
+    /delete-node/ trackball_listener;
+    trackball_listener: trackball_listener {
+        compatible = "zmk,input-listener";
+        device = <&new_trackball>;
     };
 };
