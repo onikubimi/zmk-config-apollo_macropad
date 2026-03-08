@@ -4,16 +4,14 @@
     chosen {
         zephyr,display = &oled;
     };
-
-    /* spi0側にある古いトラックボール定義を削除して競合を消す */
-    /delete-node/ trackball_listener;
 };
 
-/* 古いパスにあるノードを削除（競合の根本を断つ） */
+/* 1. 競合の元になる SPI0 (pro_micro_spi) を強制的に無効化する */
 &pro_micro_spi {
-    /delete-node/ trackball@0;
+    status = "disabled";
 };
 
+/* 2. OLED (I2C) は 0番 をそのまま使う */
 &pro_micro_i2c {
     status = "okay";
     oled: ssd1306@3c {
@@ -32,12 +30,15 @@
     };
 };
 
-/* 改めて spi1 側に定義し直す */
+/* 3. トラックボールを SPI1 (空いている別のユニット) に完全に引っ越す */
 &spi1 {
     status = "okay";
-    /* spi1のピン定義が必要な場合はここで指定しますが、nice_nanoのデフォルトを期待します */
+    pinctrl-0 = <&spi1_default>;
+    pinctrl-1 = <&spi1_sleep>;
+    pinctrl-names = "default", "sleep";
     
-    new_trackball: pmw3610@0 {
+    /* ラベル名を 'trackball' から変更して重複を避ける */
+    trackball_peripheral: pmw3610@0 {
         compatible = "pixart,pmw3610";
         reg = <0>;
         spi-max-frequency = <2000000>;
@@ -48,10 +49,10 @@
     };
 };
 
-/* リスナーも新しいノードを指すように再定義 */
+/* 4. ZMKの入力リスナーを新しい定義に向ける */
 / {
-    trackball_listener: trackball_listener {
+    trackball_listener {
         compatible = "zmk,input-listener";
-        device = <&new_trackball>;
+        device = <&trackball_peripheral>;
     };
 };
