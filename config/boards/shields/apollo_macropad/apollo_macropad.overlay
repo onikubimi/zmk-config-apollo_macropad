@@ -19,6 +19,8 @@
     };
 };
 
+/* 既存のラベル trackball_listener がない場合のみ必要ですが、
+   前回のログで undefined と出たので、念のため定義しておきます */
 / {
     trackball_listener: trackball_listener {
         compatible = "zmk,input-listener";
@@ -26,16 +28,10 @@
     };
 };
 
-&pro_micro_spi {
+/* 重要：新しいノードを作らず、既存の &trackball に不足項目を流し込む */
+&trackball {
     status = "okay";
-    trackball: pmw3610@0 {
-        compatible = "pixart,pmw3610";
-        reg = <0>;
-        spi-max-frequency = <2000000>;
-        irq-gpios = <&pro_micro 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
-        /* 必須項目の追加: マウス移動イベントとして定義 */
-        evt-type = <INPUT_EV_REL>;
-        x-input-code = <INPUT_REL_X>;
-        y-input-code = <INPUT_REL_Y>;
-    };
+    evt-type = <INPUT_EV_REL>;
+    x-input-code = <INPUT_REL_X>;
+    y-input-code = <INPUT_REL_Y>;
 };
