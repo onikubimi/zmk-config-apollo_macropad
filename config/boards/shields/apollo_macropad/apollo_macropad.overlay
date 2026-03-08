@@ -5,13 +5,15 @@
         zephyr,display = &oled;
     };
 
-    trackball_listener: trackball_listener {
-        compatible = "zmk,input-listener";
-        device = <&trackball>;
-    };
+    /* spi0側にある古いトラックボール定義を削除して競合を消す */
+    /delete-node/ trackball_listener;
 };
 
-/* OLED (I2C) はそのまま 0番 (i2c0) を使用 */
+/* 古いパスにあるノードを削除（競合の根本を断つ） */
+&pro_micro_spi {
+    /delete-node/ trackball@0;
+};
+
 &pro_micro_i2c {
     status = "okay";
     oled: ssd1306@3c {
@@ -30,15 +32,12 @@
     };
 };
 
-/* トラックボール (SPI) を 1番 (spi1) に引っ越し */
+/* 改めて spi1 側に定義し直す */
 &spi1 {
     status = "okay";
-    pinctrl-0 = <&spi1_default>;
-    pinctrl-1 = <&spi1_sleep>;
-    pinctrl-names = "default", "sleep";
+    /* spi1のピン定義が必要な場合はここで指定しますが、nice_nanoのデフォルトを期待します */
     
-    /* pro_micro_spi の代わりに spi1 を直接使い、中身を定義 */
-    trackball: pmw3610@0 {
+    new_trackball: pmw3610@0 {
         compatible = "pixart,pmw3610";
         reg = <0>;
         spi-max-frequency = <2000000>;
@@ -46,5 +45,13 @@
         evt-type = <INPUT_EV_REL>;
         x-input-code = <INPUT_REL_X>;
         y-input-code = <INPUT_REL_Y>;
+    };
+};
+
+/* リスナーも新しいノードを指すように再定義 */
+/ {
+    trackball_listener: trackball_listener {
+        compatible = "zmk,input-listener";
+        device = <&new_trackball>;
     };
 };
